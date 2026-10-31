@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "author": "Milena Trofimovskaya",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-gas-sensor",
+      "id": "mq2",
+      "top": -150,
+      "left": -40,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-pir-motion-sensor",
+      "id": "pir",
+      "top": -170,
+      "left": 100,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht",
+      "top": -170,
+      "left": 210,
+      "attrs": {
+        "humidity": "55",
+        "temperature": "24"
+      }
+    },
+    {
+      "type": "wokwi-relay-module",
+      "id": "relay",
+      "top": 230,
+      "left": 160,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 240,
+      "left": 20,
+      "attrs": {
+        "color": "red"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 290,
+      "left": 0,
+      "attrs": {
+        "value": "150"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": 240,
+      "left": 310,
+      "attrs": {
+        "color": "green"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 290,
+      "left": 290,
+      "attrs": {
+        "value": "220"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "uno:5V",
+      "mq2:VCC",
+      "red",
+      []
+    ],
+    [
+      "uno:GND.2",
+      "mq2:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:A0",
+      "mq2:AOUT",
+      "green",
+      []
+    ],
+    [
+      "uno:5V",
+      "pir:VCC",
+      "red",
+      []
+    ],
+    [
+      "uno:GND.2",
+      "pir:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:2",
+      "pir:OUT",
+      "green",
+      []
+    ],
+    [
+      "uno:5V",
+      "dht:VCC",
+      "red",
+      []
+    ],
+    [
+      "uno:GND.2",
+      "dht:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:3",
+      "dht:SDA",
+      "green",
+      []
+    ],
+    [
+      "uno:5V",
+      "relay:VCC",
+      "red",
+      []
+    ],
+    [
+      "uno:GND.2",
+      "relay:GND",
+      "black",
+      []
+    ],
+    [
+      "uno:7",
+      "relay:IN",
+      "green",
+      []
+    ],
+    [
+      "uno:8",
+      "led1:A",
+      "green",
+      []
+    ],
+    [
+      "led1:C",
+      "r1:1",
+      "black",
+      []
+    ],
+    [
+      "r1:2",
+      "uno:GND.1",
+      "black",
+      []
+    ],
+    [
+      "uno:5V",
+      "relay:COM",
+      "red",
+      []
+    ],
+    [
+      "relay:NO",
+      "led2:A",
+      "orange",
+      []
+    ],
+    [
+      "led2:C",
+      "r2:1",
+      "black",
+      []
+    ],
+    [
+      "r2:2",
+      "uno:GND.1",
+      "black",
+      []
+    ]
+  ],
+  "dependencies": {}
+}
