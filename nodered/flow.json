@@ -1,0 +1,180 @@
+[
+  {
+    "id": "tab21",
+    "type": "tab",
+    "label": "Вариант 21 — Санузел",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "n_watch",
+    "type": "watch",
+    "z": "tab21",
+    "name": "Следить за data/log.txt",
+    "files": "data/log.txt",
+    "recursive": "",
+    "x": 170,
+    "y": 100,
+    "wires": [
+      [
+        "n_read"
+      ]
+    ]
+  },
+  {
+    "id": "n_inj",
+    "type": "inject",
+    "z": "tab21",
+    "name": "Загрузить лог вручную",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 160,
+    "wires": [
+      [
+        "n_read"
+      ]
+    ]
+  },
+  {
+    "id": "n_read",
+    "type": "file in",
+    "z": "tab21",
+    "name": "Читать data/log.txt",
+    "filename": "data/log.txt",
+    "filenameType": "str",
+    "format": "utf8",
+    "chunk": false,
+    "sendError": false,
+    "encoding": "none",
+    "allProps": false,
+    "x": 400,
+    "y": 130,
+    "wires": [
+      [
+        "n_func"
+      ]
+    ]
+  },
+  {
+    "id": "n_func",
+    "type": "function",
+    "z": "tab21",
+    "name": "Разбор лога",
+    "func": "// Вариант 21. Санузел. Разбор журнала Serial Monitor и подготовка SQL\nconst T = 1;                                   // период опроса, с\nconst RANGES = { s1: [0, 100], s2: [0, 1], s3: [0, 100] };  // допустимые диапазоны\n\nconst text = String(msg.payload).replace(/^﻿/, '');\nconst sql = [];\n\ntext.split(/\\r?\\n/).forEach(raw => {\n    const line = raw.trim();\n    if (!line) return;\n    const parts = line.split(' ');\n    const kind = parts[0];                     // DATA или EVENT\n    const f = {};\n    parts.slice(1).forEach(p => {\n        const kv = p.split('=');\n        f[kv[0]] = kv[1];\n    });\n    const n = parseInt(f.n);\n    if (isNaN(n)) return;\n    const t = n * T;\n\n    if (kind === 'DATA') {\n        ['s1', 's2', 's3'].forEach(s => {\n            const v = parseFloat(f[s]);\n            // 1) запись в readings (если значения нет - пропускаем)\n            if (!isNaN(v)) {\n                sql.push(`INSERT INTO readings(n,t_s,sensor,value) VALUES(${n},${t},'${s}',${v});`);\n            }\n            // 2) значение отсутствует или вне диапазона - неисправность\n            if (isNaN(v) || v < RANGES[s][0] || v > RANGES[s][1]) {\n                sql.push(`INSERT INTO events(n,t_s,type,message) VALUES(${n},${t},'FAULT','датчик ${s} вне диапазона');`);\n            }\n        });\n    } else if (kind === 'EVENT') {\n        sql.push(`INSERT INTO events(n,t_s,type,message) VALUES(${n},${t},'${f.type}',NULL);`);\n    }\n});\n\nconst head = 'BEGIN;\\nDELETE FROM readings;\\nDELETE FROM events;\\n' +\n    \"DELETE FROM sqlite_sequence WHERE name IN ('readings','events');\\n\";\nreturn [null, { payload: head + sql.join('\\n') + '\\nCOMMIT;\\n' }];\n",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 600,
+    "y": 130,
+    "wires": [
+      [],
+      [
+        "n_file"
+      ]
+    ]
+  },
+  {
+    "id": "n_file",
+    "type": "file",
+    "z": "tab21",
+    "name": "Записать db/load.sql",
+    "filename": "db/load.sql",
+    "filenameType": "str",
+    "appendNewline": false,
+    "createDir": true,
+    "overwriteFile": "true",
+    "encoding": "none",
+    "x": 820,
+    "y": 130,
+    "wires": [
+      [
+        "n_exec"
+      ]
+    ]
+  },
+  {
+    "id": "n_exec",
+    "type": "exec",
+    "z": "tab21",
+    "command": "sqlite3 db/variant.db \".read db/schema.sql\" \".read db/load.sql\"",
+    "addpay": "",
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "winHide": false,
+    "oldrc": false,
+    "name": "Загрузить в базу",
+    "x": 1030,
+    "y": 130,
+    "wires": [
+      [
+        "n_dbg1"
+      ],
+      [
+        "n_dbg2"
+      ],
+      [
+        "n_dbg3"
+      ]
+    ]
+  },
+  {
+    "id": "n_dbg1",
+    "type": "debug",
+    "z": "tab21",
+    "name": "Ответ sqlite3",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 1250,
+    "y": 90,
+    "wires": []
+  },
+  {
+    "id": "n_dbg2",
+    "type": "debug",
+    "z": "tab21",
+    "name": "Ошибки sqlite3",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 1260,
+    "y": 130,
+    "wires": []
+  },
+  {
+    "id": "n_dbg3",
+    "type": "debug",
+    "z": "tab21",
+    "name": "Код возврата",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "x": 1250,
+    "y": 170,
+    "wires": []
+  }
+]

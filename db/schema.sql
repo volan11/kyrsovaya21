@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS readings (
+  id     INTEGER PRIMARY KEY AUTOINCREMENT,
+  n      INTEGER NOT NULL,
+  t_s    INTEGER NOT NULL,
+  sensor TEXT    NOT NULL,
+  value  REAL    NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS events (
+  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  n       INTEGER NOT NULL,
+  t_s     INTEGER NOT NULL,
+  type    TEXT    NOT NULL,
+  message TEXT
+);
