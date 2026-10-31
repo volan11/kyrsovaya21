@@ -1,0 +1,10 @@
+Designator,Name,Quantity,Note
+D1,LED red,1,LED_0603; индикатор тревоги -> D8 через R1
+D2,LED green,1,LED_0603; нагрузка реле (вентилятор)
+DHT1,DHT22,1,DHT22; влажность -> D3
+R1,150 Ом,1,R0603; ограничение тока D1
+R2,220 Ом,1,R0603; ограничение тока D2
+U1,ARDUINO UNO,1,ARDUINO_UNO_SHIELD
+U2,MQ2-SENSOR,1,MQ-2-H; дым -> A0
+U3,HC-SR501,1,HC-SR501; присутствие -> D2
+U4,ARDUINO KY-019 5V,1,ARDUINO RELAY KY-019; вентилятор -> D7
